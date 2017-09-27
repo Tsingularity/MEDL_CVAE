@@ -1,0 +1,75 @@
+import numpy as np
+from tsne import tsne
+import matplotlib.pyplot as plt
+from sklearn.manifold import TSNE
+
+
+from sklearn.decomposition import PCA 
+
+
+def gather(data,orders):
+	tang = []
+	for i in orders:
+		tang.append(data[i])
+	return np.array(tang)
+
+
+pca=PCA(n_components=2)
+
+
+# forest = np.load('forest.npy')
+# human = np.load('human.npy')
+# ocean = np.load('ocean.npy')
+
+sample_z = np.load('sample_z.npy')
+
+
+forest_order = [0,1,2,3,12,19,38,75,79,147]
+
+human_order = [238,257,726,886,888,1397,1730,1910,26834,27110]
+
+ocean_order = [45,178,266,876,1516,8112,8201,8365,8495,9318,26471]
+
+forest = gather(sample_z,forest_order)
+human = gather(sample_z,human_order)
+ocean = gather(sample_z,ocean_order)
+
+embedding = np.concatenate((forest,human,ocean),0)
+
+tsne_data = tsne(embedding, 2, 50, 20);
+
+#tsne_data=pca.fit_transform(embedding)
+
+#model = TSNE(n_components=2, random_state=0,perplexity=10,n_iter=100000)
+#tsne_data = model.fit_transform(embedding) 
+
+np.save('tsne_data.npy',tsne_data)
+
+print np.min(tsne_data[:,0])
+print np.max(tsne_data[:,0])
+
+print np.min(tsne_data[:,1])
+print np.max(tsne_data[:,1])
+
+
+
+marker = []
+color = []
+
+for i in range(len(forest)):
+	marker.append('s')
+	color.append('green')
+
+for i in range(len(human)):
+	marker.append('*')
+	color.append('grey')
+
+for i in range(len(ocean)):
+	marker.append('o')
+	color.append('blue')
+
+for i in range(len(forest)+len(human)+len(ocean)):
+	plt.scatter(tsne_data[i, 0], tsne_data[i, 1], c=color[i], marker=marker[i],s=200)
+plt.savefig('tsne.png')
+
+
